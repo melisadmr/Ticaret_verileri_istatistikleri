@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from PIL import Image, ImageTk
@@ -39,7 +40,7 @@ class MainApplication:
 
     def create_main_screen(self):
         self.main_screen = tk.Toplevel(self.root)
-        self.main_screen.title("Ana Ekran")
+        self.main_screen.title("Dünya Bankası Verileri")
         self.main_screen.geometry("800x600")
 
         background_label = tk.Label(self.main_screen, image=self.background_photo)
@@ -65,8 +66,10 @@ class MainApplication:
 
         self.show_graph_button = tk.Button(self.main_screen, text="GRAFİK ÇİZ", command=self.plot_graph, **button_style)
         self.show_graph_button.place(x=500, y=70)
-
+        
         self.back_button = tk.Button(self.main_screen, text="GERİ", command=self.go_back, **button_style)
+
+ 
 
     def plot_graph(self):
         try:
@@ -74,7 +77,8 @@ class MainApplication:
             end_year = self.end_year_entry.get()
 
             if not start_year.isdigit() or not end_year.isdigit():
-                raise ValueError("Yıl aralıkları geçerli değil.")
+                 messagebox.showerror("Geçersiz Girdi", "Yıl aralıkları geçerli değil. Lütfen geçerli yıllar giriniz.")
+                 return
 
             start_year = int(start_year)
             end_year = int(end_year)
@@ -120,6 +124,8 @@ class MainApplication:
         self.end_year_label.pack(pady=5)
         self.end_year_entry.pack(pady=5)
         self.show_graph_button.pack(pady=20, padx=20)
+        
+   
 
 if __name__ == "__main__":
     root = tk.Tk()

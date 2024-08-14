@@ -1,9 +1,11 @@
+import os
 import tkinter as tk
 from tkinter import ttk, messagebox
 from matplotlib import pyplot as plt
 from backend import WorldBankData, GraphPlotter
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import time
 
 class MainApplication:
     def __init__(self, root):
@@ -66,8 +68,10 @@ class MainApplication:
         self.show_graph_button.pack(pady=20)
 
         # "Geri Dön" butonu
-        self.back_button = tk.Button(self.main_screen, text="Geri Dön", command=self.go_back_to_welcome_screen, bg="lightcoral", fg="black", font=("Arial", 12, "bold"))
+        self.back_button = tk.Button(self.main_screen, text="GERİ", command=self.go_back_to_welcome_screen, bg="red", fg="black", font=("Arial", 12, "bold"))
         self.back_button.pack(pady=20)
+        self.save_button = tk.Button(self.main_screen, text="Grafiği Kaydet", command=self.save_graph, bg="lightgreen", fg="black", font=("Arial", 12, "bold"))
+        self.save_button.pack(pady=20)
         
     def create_input_widgets(self):
         self.start_year_label = tk.Label(self.main_screen, text="Başlangıç Yılı:", font=("Arial", 12,"bold"))
@@ -97,6 +101,8 @@ class MainApplication:
         else:
          plotter = GraphPlotter(years, values)
          plotter.plot(graph_type)
+         self.current_fig = plt.gcf() # Şu anki grafiği kaydetmek için
+         self.current_graph_type = graph_type  # Grafik türünü kaydetmek için
          plt.show()
         
     def go_back_to_welcome_screen(self):
@@ -140,7 +146,7 @@ class MainApplication:
 
      # "Geri Dön" butonu
         
-        self.back_button = tk.Button(self.analysis_screen, text="Geri Dön", command=self.go_back_to_welcome_screen_from_analysis, bg="lightcoral", fg="black",width=10, height=3, font=("Arial", 12, "bold"))
+        self.back_button = tk.Button(self.analysis_screen, text="GERİ", command=self.go_back_to_welcome_screen_from_analysis, bg="red", fg="black",width=10, height=3, font=("Arial", 12, "bold"))
         self.back_button.place(x=0,y=525)
         
     def create_input_widgets_for_analysis(self):
@@ -214,6 +220,16 @@ class MainApplication:
         current_text = self.result_label.cget("text")
         new_text = current_text + "\n" + result_text if current_text else result_text
         self.result_label.config(text=new_text)
+    def save_graph(self):
+        if hasattr(self, 'current_fig'):
+            # Benzersiz dosya adı oluşturma (grafik türü + zaman damgası)
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            save_path = os.path.join(os.getcwd(), f"{self.current_graph_type}_grafik_{timestamp}.png")
+            self.current_fig.savefig(save_path)
+            messagebox.showinfo("Başarılı", f"Grafik kaydedildi: {save_path}")
+        else:
+            messagebox.showerror("Hata", "Kaydedilecek bir grafik yok. Önce grafiği oluşturun.")
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = MainApplication(root)

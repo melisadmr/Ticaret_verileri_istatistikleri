@@ -46,5 +46,14 @@ class GraphPlotter:
         plt.xlabel('Yıl', fontsize=12)
         plt.ylabel('Ticaretin GSYH\'ya Oranı (%)', fontsize=12)
         plt.grid(True)
+    
+    def calculate_standard_deviation(self):
+        return pd.Series(self.values).std()
+
+    def calculate_median(self):
+        return pd.Series(self.values).median()
+
+    def calculate_mean(self):
+        return pd.Series(self.values).mean()
         
         

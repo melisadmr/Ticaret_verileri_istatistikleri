@@ -70,8 +70,12 @@ class MainApplication:
         # "Geri Dön" butonu
         self.back_button = tk.Button(self.main_screen, text="GERİ", command=self.go_back_to_welcome_screen, bg="red", fg="black", font=("Arial", 12, "bold"))
         self.back_button.pack(pady=20)
+        # "kaydet" butonu 
         self.save_button = tk.Button(self.main_screen, text="Grafiği Kaydet", command=self.save_graph, bg="lightgreen", fg="black", font=("Arial", 12, "bold"))
         self.save_button.pack(pady=20)
+        #tahmin et butonu
+        self.predict_button = tk.Button(self.main_screen, text="Tahmin Yap", command=self.predict_future, bg="orange", fg="black", font=("Arial", 12, "bold"))
+        self.predict_button.pack(pady=20)
         
     def create_input_widgets(self):
         self.start_year_label = tk.Label(self.main_screen, text="Başlangıç Yılı:", font=("Arial", 12,"bold"))
@@ -88,6 +92,8 @@ class MainApplication:
         start_year = self.start_year_entry.get()
         end_year = self.end_year_entry.get()
 
+
+         
         if not start_year.isdigit() or not end_year.isdigit():
             messagebox.showerror("Hata", "Lütfen geçerli bir yıl aralığı girin.")
             return
@@ -98,12 +104,32 @@ class MainApplication:
         graph_type = self.graph_type.get()
         if graph_type == "Grafik Türü":  # Kullanıcı seçim yapmadıysa
             messagebox.showerror("Hata", "Lütfen bir grafik türü seçin!")
+        
         else:
-         plotter = GraphPlotter(years, values)
-         plotter.plot(graph_type)
-         self.current_fig = plt.gcf() # Şu anki grafiği kaydetmek için
-         self.current_graph_type = graph_type  # Grafik türünü kaydetmek için
-         plt.show()
+          plotter = GraphPlotter(years, values)
+          plotter.plot(graph_type, trendline=True)  # Eğilim çizgisini eklemek için trendline=True ekleyin
+          self.current_fig = plt.gcf()
+          self.current_graph_type = graph_type
+          plt.show()
+    def predict_future(self):
+        start_year = self.start_year_entry.get()
+        end_year = self.end_year_entry.get()
+        data_fetcher = WorldBankData("NE.TRD.GNFS.ZS", "TUR")
+        years, values = data_fetcher.fetch_data(start_year, end_year)
+        periods = 5 # Kaç dönem ileriye tahmin yapılacak
+        plotter = GraphPlotter(years,values)
+        future_years, predictions = plotter.predict_next_values(periods=periods, method="linear")
+        
+        # Tahmin edilen değerleri çiz
+        plt.figure(figsize=(10, 5))
+        plt.plot(years, values, marker='o', linestyle='-', color='b', label="Gerçek Değerler")
+        plt.plot(future_years, predictions, marker='o', linestyle='--', color='r', label="Tahmin Edilen Değerler")
+        plt.title("Veri Tahmini")
+        plt.xlabel("Yıl")
+        plt.ylabel("Ticaretin GSYH'ya Oranı (%)")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
         
     def go_back_to_welcome_screen(self):
         self.main_screen.destroy()  # Ana ekranı kapatma

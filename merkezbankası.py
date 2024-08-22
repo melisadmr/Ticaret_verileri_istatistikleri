@@ -4,10 +4,11 @@ from evds import evdsAPI
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import time
+import os
 
 # EVDS API bağlanma
 evds = evdsAPI('UyFuSmnH7n')
-
 # Seri kodları ve başlıklar
 data_series = {
     'Dış Ticaret İhracat Miktar Endeksi (ölçüm bazında)': 'TP.DT.IH.MIK.D01.2010',
@@ -23,12 +24,17 @@ data_series = {
     'İhracat Miktar Endeks (Motor Benzini Ve Diğer Hafif Yağlar)': 'TP.DT.IH.MIK.D19.2010'
 }
 
+
 def plot_data(series_code, title, start_date, end_date,graph_type):
+    
+   
+    
+    
+    
     try:
         data = evds.get_data([series_code], startdate=start_date, enddate=end_date)
         df = pd.DataFrame(data)
         df['Tarih'] = pd.to_datetime(df['Tarih'], format='%Y-%m')
-
         plt.figure(figsize=(10, 6))
         if graph_type == "Çizgi":
             plt.plot(df['Tarih'], df[series_code.replace('.', '_')], marker='o', linestyle='-', color='b')
@@ -38,7 +44,6 @@ def plot_data(series_code, title, start_date, end_date,graph_type):
             plt.scatter(df['Tarih'], df[series_code.replace('.', '_')], color='r')
         elif graph_type == "Pasta":
             plt.pie(df[series_code.replace('.', '_')], labels=df['Tarih'], autopct='%1.1f%%')
-        
         plt.title(title)
         plt.xlabel('Tarih')
         plt.ylabel('Değer')
@@ -48,4 +53,15 @@ def plot_data(series_code, title, start_date, end_date,graph_type):
         plt.show()
     except Exception as e:
         messagebox.showerror("Hata", f"Veri çekme hatası: {e}")
+def calculate_standard_deviation(self):
+        return pd.Series(self.values).std()
+    
+
+def calculate_median(self):
+        return pd.Series(self.values).median()
+    
+    
+def calculate_mean(self):
+        return pd.Series(self.values).mean()
+        
 
